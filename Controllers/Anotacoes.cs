@@ -60,6 +60,29 @@ namespace Back_End.Controllers
             return anotacao;
         }
 
+        [HttpPut("{id}")]
+
+        public async Task<IActionResult> AtualizarAnotacao(Guid id, Anotacao anotacao)
+        {
+
+            if (id != anotacao.Id)
+            {
+                return BadRequest();
+            }
+
+
+
+                //modificar a anotação
+
+              _context.Entry(anotacao).State = EntityState.Modified;
+
+              await _context.SaveChangesAsync();
+
+            
+
+            return Ok(anotacao);
+        }
+
 
     }
 }
