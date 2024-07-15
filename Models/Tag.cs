@@ -11,7 +11,5 @@ namespace Back_End.Models
 
         public List<Anotacao> Anotacoes { get; set; } = new List<Anotacao>();
 
-
-
     }
 }

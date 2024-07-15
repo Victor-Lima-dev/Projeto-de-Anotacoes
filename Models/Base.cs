@@ -7,6 +7,6 @@ namespace Back_End.Models
 {
     public class Base
     {
-        public guid Id { get; set; } = Guid.NewGuid();
+        public Guid Id { get; set; } = Guid.NewGuid();
     }
 }
