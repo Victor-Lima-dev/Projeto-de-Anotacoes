@@ -24,15 +24,34 @@ namespace Back_End.Controllers
         [HttpPost]
         public async Task<ActionResult<Anotacao>> CriarAnotacao([FromBody] Anotacao anotacao)
         {
+            var tagsFinal = new List<Tag>();
+            
+            foreach (var tag in anotacao.Tags)
+            {
+                var tagExistente = await _context.Tags.FirstOrDefaultAsync(t => t.Titulo == tag.Titulo);
+        
+                if (tagExistente != null)
+                {
+                    // Use a tag existente em vez de criar uma nova
+                    tagsFinal.Add(tagExistente);
+                }
+                else
+                {
+                    // Se a tag não existir, adicione a nova tag à lista
+                    tagsFinal.Add(tag);
+                    // Como é uma nova tag, associe a anotação a ela
+                    tag.Anotacoes.Add(anotacao);
+                }
+            }
+        
+            // Atualize as tags da anotação para as tags finais (existentes ou novas)
+            anotacao.Tags = tagsFinal;
+        
             _context.Anotacoes.Add(anotacao);
-
-             //se entrar uma tag que já existe, ele não cria uma nova tag, ele só adiciona a tag que já existe
-
+        
             await _context.SaveChangesAsync();
-
-           // return anotacao;
-
-            return CreatedAtAction("GetAnotacao", new { id = anotacao.Id }, anotacao);
+        
+            return anotacao;
         }
 
         [HttpGet]
@@ -67,22 +86,58 @@ namespace Back_End.Controllers
 
             if (id != anotacao.Id)
             {
-                return BadRequest();
+                return BadRequest("Id da anotação diferente do id informado");
             }
-
-
-
-                //modificar a anotação
 
               _context.Entry(anotacao).State = EntityState.Modified;
 
               await _context.SaveChangesAsync();
 
-            
-
             return Ok(anotacao);
         }
 
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeletarAnotacao(Guid id)
+        {
+            var anotacao = await _context.Anotacoes.FindAsync(id);
+
+            if (anotacao == null)
+            {
+                return NotFound("Anotação não encontrada");
+            }
+
+            _context.Anotacoes.Remove(anotacao);
+
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        [HttpDelete]
+
+        public async Task<IActionResult> DeletarTodasAnotacoes()
+        {
+            //preciso apagar as tags também
+
+
+            var anotacoes = await _context.Anotacoes.ToListAsync();
+
+            if (anotacoes.Count == 0)
+            {
+                return NotFound("Não há anotações para deletar");
+            }
+
+            _context.Anotacoes.RemoveRange(anotacoes);
+
+            var tags = await _context.Tags.ToListAsync();
+
+            _context.Tags.RemoveRange(tags);
+
+
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
 
     }
 }
