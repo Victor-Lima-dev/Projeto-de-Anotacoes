@@ -11,6 +11,8 @@ namespace Back_End.Models
 
         public string Conteudo { get; set; }
 
+        public string Html { get; set; }
+
         public List<Tag> Tags { get; set; } = new List<Tag>();
     }
 }

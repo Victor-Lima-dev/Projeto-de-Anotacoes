@@ -117,8 +117,6 @@ namespace Back_End.Controllers
 
         public async Task<IActionResult> DeletarTodasAnotacoes()
         {
-            //preciso apagar as tags também
-
 
             var anotacoes = await _context.Anotacoes.ToListAsync();
 
@@ -173,7 +171,6 @@ namespace Back_End.Controllers
         })
         .ToListAsync();
 
-           
             return anotacoes;
         }
 
